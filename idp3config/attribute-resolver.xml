@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<AttributeResolver
+        xmlns="urn:mace:shibboleth:2.0:resolver"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd">
+
+    <!-- ========================================== -->
+    <!--      Attribute Definitions                 -->
+    <!-- ========================================== -->
+
+    <AttributeDefinition xsi:type="Scoped" id="eduPersonScopedAffiliation" scope="%{idp.scope}">
+        <InputDataConnector ref="myLDAP" attributeNames="employeeType"/>
+        <AttributeEncoder xsi:type="SAML1ScopedString" name="urn:mace:dir:attribute-def:eduPersonScopedAffiliation" encodeType="false" />
+        <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.9" friendlyName="eduPersonScopedAffiliation" encodeType="false" />
+    </AttributeDefinition>
+
+    <AttributeDefinition xsi:type="Scoped" id="eduPersonPrincipalName" scope="%{idp.scope}">
+        <InputDataConnector ref="myLDAP" attributeNames="uid"/>
+        <AttributeEncoder xsi:type="SAML1ScopedString" name="urn:mace:dir:attribute-def:eduPersonPrincipalName" encodeType="false" />
+        <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" friendlyName="eduPersonPrincipalName" encodeType="false" />
+    </AttributeDefinition>
+
+    <AttributeDefinition id="eduPersonTargetedID" xsi:type="SAML2NameID" nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+        <InputDataConnector ref="ComputedIDConnector" attributeNames="computedID"/>
+        <AttributeEncoder xsi:type="SAML1XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" encodeType="false"/>
+        <AttributeEncoder xsi:type="SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" friendlyName="eduPersonTargetedID" encodeType="false"/>
+    </AttributeDefinition> 
+
+    <AttributeDefinition id="eduPersonEntitlement" xsi:type="Simple">
+        <InputDataConnector ref="staticAttributes" attributeNames="eduPersonEntitlement" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonEntitlement" encodeType="false"/>
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" friendlyName="eduPersonEntitlement" encodeType="false"/>
+    </AttributeDefinition>
+
+    <!-- ========================================== -->
+    <!--      Data Connectors                       -->
+    <!-- ========================================== -->
+    
+
+    <DataConnector id="ComputedIDConnector" xsi:type="ComputedId" generatedAttributeID="computedID" salt="xxxxxxxxxxxxxxxxxxxx" encoding="BASE64">
+        <InputAttributeDefinition ref="eduPersonPrincipalName" />
+    </DataConnector>
+
+    <DataConnector id="staticAttributes" xsi:type="Static">
+        <Attribute id="eduPersonEntitlement">
+        <Value>urn:mace:dir:entitlement:common-lib-terms</Value>
+        </Attribute>
+    </DataConnector>
+
+    <DataConnector id="myLDAP" xsi:type="LDAPDirectory"
+        ldapURL="%{idp.attribute.resolver.LDAP.ldapURL}"
+        baseDN="%{idp.attribute.resolver.LDAP.baseDN}" 
+        principal="%{idp.attribute.resolver.LDAP.bindDN}"
+        principalCredential="%{idp.attribute.resolver.LDAP.bindDNCredential}"
+        connectTimeout="%{idp.attribute.resolver.LDAP.connectTimeout}"
+        responseTimeout="%{idp.attribute.resolver.LDAP.responseTimeout}">
+        <FilterTemplate>
+            <![CDATA[
+                %{idp.attribute.resolver.LDAP.searchFilter}
+            ]]>
+        </FilterTemplate>
+        <ConnectionPool
+            minPoolSize="%{idp.pool.LDAP.minSize:3}"
+            maxPoolSize="%{idp.pool.LDAP.maxSize:10}"
+            blockWaitTime="%{idp.pool.LDAP.blockWaitTime:PT3S}"
+            validatePeriodically="%{idp.pool.LDAP.validatePeriodically:true}"
+            validateTimerPeriod="%{idp.pool.LDAP.validatePeriod:PT5M}"
+            expirationTime="%{idp.pool.LDAP.idleTime:PT10M}"
+            failFastInitialize="%{idp.pool.LDAP.failFastInitialize:false}" />
+    </DataConnector>
+
+</AttributeResolver>
+

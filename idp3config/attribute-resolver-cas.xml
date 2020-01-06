@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AttributeResolver
+        xmlns="urn:mace:shibboleth:2.0:resolver"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+        xsi:schemaLocation="urn:mace:shibboleth:2.0:resolver http://shibboleth.net/schema/idp/shibboleth-attribute-resolver.xsd">
+
+    <AttributeDefinition id="eduPersonScopedAffiliation" xsi:type="Scoped" scope="%{idp.scope}" sourceAttributeID="employeetype">
+        <Dependency ref="employeetype" />
+        <AttributeEncoder xsi:type="SAML1ScopedString" name="urn:mace:dir:attribute-def:eduPersonScopedAffiliation" encodeType="false" />
+        <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.9" friendlyName="eduPersonScopedAffiliation" encodeType="false" />
+    </AttributeDefinition>
+    <AttributeDefinition xsi:type="SubjectDerivedAttribute" id="employeetype" principalAttributeName="eduPersonScopedAffiliation"></AttributeDefinition>
+
+    <AttributeDefinition id="eduPersonPrincipalName" xsi:type="Scoped" scope="%{idp.scope}" sourceAttributeID="employeename">
+        <Dependency ref="employeename" />
+        <AttributeEncoder xsi:type="SAML1ScopedString" name="urn:mace:dir:attribute-def:eduPersonPrincipalName" encodeType="false" />
+        <AttributeEncoder xsi:type="SAML2ScopedString" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" friendlyName="eduPersonPrincipalName" encodeType="false" />
+    </AttributeDefinition>
+    <AttributeDefinition xsi:type="SubjectDerivedAttribute" id="employeename" principalAttributeName="eduPersonPrincipalName"></AttributeDefinition>
+
+    <AttributeDefinition id="eduPersonTargetedID" xsi:type="SAML2NameID" nameIdFormat="urn:oasis:names:tc:SAML:2.0:nameid-format:persistent">
+        <InputDataConnector ref="ComputedIDConnector" attributeNames="computedID"/>
+        <AttributeEncoder xsi:type="SAML1XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" encodeType="false"/>
+        <AttributeEncoder xsi:type="SAML2XMLObject" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" friendlyName="eduPersonTargetedID" encodeType="false"/>
+    </AttributeDefinition> 
+    <DataConnector id="ComputedIDConnector" xsi:type="ComputedId" generatedAttributeID="computedID" salt="xxxxxxxxxxxxxxxxxxxx" encoding="BASE64">
+        <InputAttributeDefinition ref="eduPersonPrincipalName" />
+    </DataConnector>
+
+    <AttributeDefinition id="eduPersonEntitlement" xsi:type="Simple">
+        <InputDataConnector ref="staticAttributes" attributeNames="eduPersonEntitlement" />
+        <AttributeEncoder xsi:type="SAML1String" name="urn:mace:dir:attribute-def:eduPersonEntitlement" encodeType="false"/>
+        <AttributeEncoder xsi:type="SAML2String" name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" friendlyName="eduPersonEntitlement" encodeType="false"/>
+    </AttributeDefinition>
+    <DataConnector id="staticAttributes" xsi:type="Static">
+        <Attribute id="eduPersonEntitlement">
+        <Value>urn:mace:dir:entitlement:common-lib-terms</Value>
+        </Attribute>
+    </DataConnector>
+
+</AttributeResolver>
