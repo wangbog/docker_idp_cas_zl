@@ -31,7 +31,7 @@ rm -rf /root/inst/idp3config/shibboleth-identity-provider-3.4.3/
 cd /root/inst/idp3config/
 tar xzf shibboleth-identity-provider-3.4.3.tar.gz
 sh /root/inst/idp3config/shibboleth-identity-provider-3.4.3/bin/install.sh
-sed -i "s/Fill in the details for your IdP here/Fill in the details for your CAS IdP here/g" /opt/shibboleth-idp/metadata/idp-metadata.xml
+sed -i "s/Fill in the details for your IdP here/Fill in the details for your UIM-Z IdP here/g" /opt/shibboleth-idp/metadata/idp-metadata.xml
 openssl pkcs12 -in /opt/shibboleth-idp/credentials/idp-backchannel.p12 -out /opt/shibboleth-idp/credentials/idp-backchannel.key -nocerts -nodes
 \cp -f /root/inst/idp3config/metadata-providers-pre.xml /opt/shibboleth-idp/conf/metadata-providers.xml
 \cp -f /root/inst/idp3config/attribute-resolver.xml /opt/shibboleth-idp/conf/attribute-resolver.xml
